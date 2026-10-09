@@ -13,7 +13,7 @@ export async function getProfile(
 
   const { data } = await supabase
     .from("profiles")
-    .select("id,email,full_name,role,created_at")
+    .select("id,email,sales_id,full_name,role,created_at")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -22,6 +22,7 @@ export async function getProfile(
   return {
     id: user.id,
     email: user.email ?? "",
+    sales_id: user.email ? user.email.split("@")[0] : null,
     full_name: user.email ?? null,
     role: "viewer",
     created_at: new Date().toISOString(),

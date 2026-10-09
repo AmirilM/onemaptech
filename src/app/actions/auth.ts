@@ -2,17 +2,27 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isSalesId, normalizeSalesId, toAuthEmail } from "@/lib/auth-identifier";
 
 export async function signIn(formData: FormData) {
-  const email = String(formData.get("email") ?? "");
+  const salesId = normalizeSalesId(String(formData.get("salesId") ?? ""));
   const password = String(formData.get("password") ?? "");
   const redirectTo = String(formData.get("redirectedFrom") ?? "/overview");
 
+  if (!isSalesId(salesId)) {
+    redirect(`/login?error=${encodeURIComponent("Sales ID harus berupa angka.")}`);
+  }
+
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({
+    email: toAuthEmail(salesId),
+    password,
+  });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    redirect(
+      `/login?error=${encodeURIComponent("Sales ID atau password salah.")}`,
+    );
   }
 
   redirect(redirectTo || "/overview");

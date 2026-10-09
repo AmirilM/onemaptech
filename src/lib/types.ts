@@ -3,6 +3,7 @@ export type UserRole = "admin" | "viewer";
 export interface Profile {
   id: string;
   email: string;
+  sales_id: string | null;
   full_name: string | null;
   role: UserRole;
   created_at: string;

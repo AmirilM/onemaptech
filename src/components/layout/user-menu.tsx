@@ -3,7 +3,7 @@ import { signOut } from "@/app/actions/auth";
 import type { Profile } from "@/lib/types";
 
 export function UserMenu({ profile }: { profile: Profile }) {
-  const name = profile.full_name ?? profile.email;
+  const name = profile.sales_id ?? profile.full_name ?? profile.email;
   return (
     <div className="flex items-center gap-3">
       <div className="hidden text-right sm:block">
