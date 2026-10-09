@@ -10,8 +10,8 @@ group by date;
 
 create or replace view public.v_sales_by_store as
 select store_code,
-       max(store_name) as store_name,
-       max(concept) as concept,
+       max(s.store_name) as store_name,
+       max(s.concept) as concept,
        sum(t.localamount) as revenue,
        sum(t.qty_item) as qty,
        count(*) as transactions
