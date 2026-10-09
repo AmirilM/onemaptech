@@ -7,6 +7,8 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Line,
+  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -16,18 +18,46 @@ import {
 } from "recharts";
 import { formatCompactIDR, formatIDR, formatNumber } from "@/lib/format";
 
+const BRAND = "#e60026";
 const COLORS = [
-  "#3366ff",
-  "#1f47e6",
-  "#598dff",
-  "#8eb6ff",
+  "#e60026",
+  "#f2584c",
+  "#ff9daa",
+  "#a3001b",
+  "#86061c",
+  "#78716c",
   "#0ea5e9",
   "#14b8a6",
   "#f59e0b",
-  "#ef4444",
   "#8b5cf6",
-  "#ec4899",
 ];
+
+const tooltipStyle = {
+  borderRadius: 12,
+  borderColor: "var(--color-border)",
+  background: "var(--color-surface)",
+  color: "var(--color-foreground)",
+  fontSize: 12,
+} as const;
+
+export function Sparkline({ data }: { data: number[] }) {
+  const chartData = data.map((v, i) => ({ i, v }));
+  return (
+    <div className="h-8 w-24">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <Line
+            type="monotone"
+            dataKey="v"
+            stroke={BRAND}
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 export function TrendAreaChart({
   data,
@@ -39,28 +69,34 @@ export function TrendAreaChart({
       <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3366ff" stopOpacity={0.35} />
-            <stop offset="95%" stopColor="#3366ff" stopOpacity={0} />
+            <stop offset="5%" stopColor={BRAND} stopOpacity={0.35} />
+            <stop offset="95%" stopColor={BRAND} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
-        <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--color-border)"
+          vertical={false}
+        />
+        <XAxis
+          dataKey="label"
+          tick={{ fontSize: 12, fill: "var(--color-muted)" }}
+          stroke="var(--color-border)"
+        />
         <YAxis
-          tick={{ fontSize: 12 }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 12, fill: "var(--color-muted)" }}
+          stroke="var(--color-border)"
           tickFormatter={(v) => formatCompactIDR(Number(v))}
           width={80}
         />
-        <Tooltip
-          formatter={(v) => formatIDR(Number(v))}
-          contentStyle={{ borderRadius: 12, borderColor: "#e2e8f0" }}
-        />
+        <Tooltip formatter={(v) => formatIDR(Number(v))} contentStyle={tooltipStyle} />
         <Area
           type="monotone"
           dataKey="revenue"
-          stroke="#3366ff"
+          stroke={BRAND}
           strokeWidth={2}
           fill="url(#rev)"
+          animationDuration={700}
         />
       </AreaChart>
     </ResponsiveContainer>
@@ -79,25 +115,31 @@ export function RankBarChart({
         layout="vertical"
         margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" horizontal={false} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--color-border)"
+          horizontal={false}
+        />
         <XAxis
           type="number"
-          tick={{ fontSize: 11 }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 11, fill: "var(--color-muted)" }}
+          stroke="var(--color-border)"
           tickFormatter={(v) => formatCompactIDR(Number(v))}
         />
         <YAxis
           type="category"
           dataKey="label"
-          tick={{ fontSize: 11 }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 11, fill: "var(--color-muted)" }}
+          stroke="var(--color-border)"
           width={150}
         />
-        <Tooltip
-          formatter={(v) => formatIDR(Number(v))}
-          contentStyle={{ borderRadius: 12, borderColor: "#e2e8f0" }}
+        <Tooltip formatter={(v) => formatIDR(Number(v))} contentStyle={tooltipStyle} />
+        <Bar
+          dataKey="revenue"
+          fill={BRAND}
+          radius={[0, 6, 6, 0]}
+          animationDuration={700}
         />
-        <Bar dataKey="revenue" fill="#3366ff" radius={[0, 6, 6, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -118,15 +160,13 @@ export function CategoryDonut({
           innerRadius={60}
           outerRadius={100}
           paddingAngle={2}
+          animationDuration={700}
         >
           {data.map((_, i) => (
             <Cell key={i} fill={COLORS[i % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip
-          formatter={(v) => formatIDR(Number(v))}
-          contentStyle={{ borderRadius: 12, borderColor: "#e2e8f0" }}
-        />
+        <Tooltip formatter={(v) => formatIDR(Number(v))} contentStyle={tooltipStyle} />
       </PieChart>
     </ResponsiveContainer>
   );
@@ -140,26 +180,33 @@ export function QtyBarChart({
   return (
     <ResponsiveContainer width="100%" height={320}>
       <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--color-border)"
+          vertical={false}
+        />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 11 }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 11, fill: "var(--color-muted)" }}
+          stroke="var(--color-border)"
           angle={-35}
           textAnchor="end"
           interval={0}
         />
         <YAxis
-          tick={{ fontSize: 11 }}
-          stroke="#94a3b8"
+          tick={{ fontSize: 11, fill: "var(--color-muted)" }}
+          stroke="var(--color-border)"
           tickFormatter={(v) => formatNumber(Number(v))}
         />
-        <Tooltip
-          formatter={(v) => formatNumber(Number(v))}
-          contentStyle={{ borderRadius: 12, borderColor: "#e2e8f0" }}
+        <Tooltip formatter={(v) => formatNumber(Number(v))} contentStyle={tooltipStyle} />
+        <Bar
+          dataKey="qty"
+          fill={BRAND}
+          radius={[6, 6, 0, 0]}
+          animationDuration={700}
         />
-        <Bar dataKey="qty" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
 }
+

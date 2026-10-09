@@ -1,22 +1,91 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --color-brand-50: #eef4ff;
-  --color-brand-100: #d9e6ff;
-  --color-brand-200: #bcd3ff;
-  --color-brand-500: #3366ff;
-  --color-brand-600: #1f47e6;
-  --color-brand-700: #1a37b4;
-  --color-brand-900: #1c2f72;
-  --color-brand-950: #141d45;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --color-brand-50: #fff1f3;
+  --color-brand-100: #ffe0e4;
+  --color-brand-200: #ffc6ce;
+  --color-brand-300: #ff9daa;
+  --color-brand-400: #ff6478;
+  --color-brand-500: #e60026;
+  --color-brand-600: #c40020;
+  --color-brand-700: #a3001b;
+  --color-brand-800: #86061c;
+  --color-brand-900: #72091c;
+  --color-brand-950: #3f000c;
+
+  --color-background: #fafaf9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f5f4;
+  --color-border: #e7e5e4;
+  --color-foreground: #1c1917;
+  --color-muted: #78716c;
+  --color-subtle: #a8a29e;
+
+  --radius-xl: 0.9rem;
+  --radius-2xl: 1.25rem;
 }
 
-html,
-body {
-  height: 100%;
+.dark {
+  --color-background: #0c0a09;
+  --color-surface: #1c1917;
+  --color-surface-muted: #292524;
+  --color-border: #292524;
+  --color-foreground: #fafaf9;
+  --color-muted: #a8a29e;
+  --color-subtle: #78716c;
 }
 
-body {
-  background-color: #f6f7fb;
-  color: #0f172a;
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-500);
+    color: white;
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation: fade-slide-in 0.35s ease both;
+  }
+
+  @keyframes fade-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
 }

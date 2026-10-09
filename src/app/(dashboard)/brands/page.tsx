@@ -1,12 +1,16 @@
 import { redirect } from "next/navigation";
+import { Tags } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getFilterOptions } from "@/lib/filter-options";
 import { parseFilters } from "@/lib/filters";
 import { fetchTransactions, groupBy } from "@/lib/metrics";
 import { formatIDR, formatNumber } from "@/lib/format";
 import { Card, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { FilterBar } from "@/components/filters/filter-bar";
 import { RankBarChart, CategoryDonut } from "@/components/charts/charts";
+
+const LEGEND = ["#e60026", "#f2584c", "#ff9daa", "#a3001b", "#86061c"];
 
 export default async function BrandsPage({
   searchParams,
@@ -49,36 +53,33 @@ export default async function BrandsPage({
           {brands.length ? (
             <RankBarChart data={brands.slice(0, 10)} />
           ) : (
-            <Empty />
+            <EmptyState icon={<Tags size={20} />} title="Belum ada data" />
           )}
         </Card>
 
         <Card>
           <CardTitle subtitle="Kontribusi KPI group">KPI Group</CardTitle>
           {kpiGroups.length ? (
-            <CategoryDonut data={kpiGroups} />
-          ) : (
-            <Empty />
-          )}
-          <div className="mt-3 flex flex-wrap gap-3">
-            {kpiGroups.map((k, i) => (
-              <div key={k.key} className="flex items-center gap-1.5 text-xs">
-                <span
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{
-                    backgroundColor: [
-                      "#3366ff",
-                      "#1f47e6",
-                      "#598dff",
-                      "#8eb6ff",
-                      "#0ea5e9",
-                    ][i % 5],
-                  }}
-                />
-                <span className="text-slate-600">{k.label}</span>
+            <>
+              <CategoryDonut data={kpiGroups} />
+              <div className="mt-3 flex flex-wrap gap-3">
+                {kpiGroups.map((k, i) => (
+                  <div
+                    key={k.key}
+                    className="flex items-center gap-1.5 text-xs"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: LEGEND[i % LEGEND.length] }}
+                    />
+                    <span className="text-muted">{k.label}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          ) : (
+            <EmptyState title="Belum ada data" />
+          )}
         </Card>
       </div>
 
@@ -86,46 +87,44 @@ export default async function BrandsPage({
         <CardTitle subtitle="Revenue per kategori produk">
           Kategori Produk
         </CardTitle>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-400">
-                <th className="py-2 pr-3">Kategori</th>
-                <th className="py-2 pr-3 text-right">Revenue</th>
-                <th className="py-2 pr-3 text-right">Qty</th>
-                <th className="py-2 text-right">Share</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((c) => (
-                <tr key={c.key} className="border-b border-slate-100">
-                  <td className="py-2 pr-3 text-slate-700">{c.label}</td>
-                  <td className="py-2 pr-3 text-right text-slate-800">
-                    {formatIDR(c.revenue)}
-                  </td>
-                  <td className="py-2 pr-3 text-right text-slate-500">
-                    {formatNumber(c.qty)}
-                  </td>
-                  <td className="py-2 text-right text-slate-500">
-                    {totalRevenue
-                      ? `${((c.revenue / totalRevenue) * 100).toFixed(1)}%`
-                      : "0%"}
-                  </td>
+        {categories.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs uppercase text-subtle">
+                  <th className="py-2 pr-3 font-medium">Kategori</th>
+                  <th className="py-2 pr-3 text-right font-medium">Revenue</th>
+                  <th className="py-2 pr-3 text-right font-medium">Qty</th>
+                  <th className="py-2 text-right font-medium">Share</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {categories.length ? null : <Empty />}
-        </div>
+              </thead>
+              <tbody>
+                {categories.map((c) => (
+                  <tr
+                    key={c.key}
+                    className="border-b border-border/60 last:border-0 hover:bg-surface-muted"
+                  >
+                    <td className="py-2 pr-3 text-foreground">{c.label}</td>
+                    <td className="py-2 pr-3 text-right font-medium text-foreground">
+                      {formatIDR(c.revenue)}
+                    </td>
+                    <td className="py-2 pr-3 text-right text-muted">
+                      {formatNumber(c.qty)}
+                    </td>
+                    <td className="py-2 text-right text-muted">
+                      {totalRevenue
+                        ? `${((c.revenue / totalRevenue) * 100).toFixed(1)}%`
+                        : "0%"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState title="Belum ada data" />
+        )}
       </Card>
-    </div>
-  );
-}
-
-function Empty() {
-  return (
-    <div className="flex h-40 items-center justify-center text-sm text-slate-400">
-      Belum ada data.
     </div>
   );
 }

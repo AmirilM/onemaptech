@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
+import { Upload as UploadIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/profile";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Card } from "@/components/ui/card";
 import { UploadForm } from "./upload-form";
 
 export default async function UploadPage() {
@@ -13,19 +16,23 @@ export default async function UploadPage() {
   const profile = await getProfile(supabase);
   if (profile?.role !== "admin") {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-        <p className="text-sm text-slate-600">
-          Halaman ini hanya dapat diakses oleh admin.
-        </p>
-      </div>
+      <Card>
+        <EmptyState
+          icon={<UploadIcon size={20} />}
+          title="Akses terbatas"
+          description="Halaman ini hanya dapat diakses oleh admin."
+        />
+      </Card>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
       <div>
-        <h1 className="text-lg font-semibold text-slate-900">Upload Data</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="font-display text-lg font-semibold text-foreground">
+          Upload Data
+        </h1>
+        <p className="text-sm text-muted">
           Unggah file Excel transaksi harian untuk memperbarui dashboard.
         </p>
       </div>

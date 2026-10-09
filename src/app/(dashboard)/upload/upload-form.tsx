@@ -1,10 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { Upload, CheckCircle2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { uploadWorkbook } from "@/app/actions/upload";
 import { formatIDR, formatNumber } from "@/lib/format";
 import type { ImportSummary } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export function UploadForm() {
   const [summary, formAction, pending] = useActionState<
@@ -12,21 +15,36 @@ export function UploadForm() {
     FormData
   >(uploadWorkbook, null);
 
+  useEffect(() => {
+    if (!summary) return;
+    if (summary.total > 0 && summary.errors.length === 0) {
+      toast.success("Impor berhasil", {
+        description: `${formatNumber(summary.inserted)} baru, ${formatNumber(
+          summary.updated,
+        )} diperbarui.`,
+      });
+    } else {
+      toast.warning("Impor selesai dengan catatan", {
+        description: summary.errors[0] ?? "Periksa detail di bawah.",
+      });
+    }
+  }, [summary]);
+
   return (
     <div className="space-y-5">
       <form
         action={formAction}
-        className="rounded-xl border-2 border-dashed border-slate-300 bg-white p-8 text-center"
+        className="rounded-2xl border-2 border-dashed border-border bg-surface p-8 text-center"
       >
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-brand-950 dark:text-brand-300">
           <Upload size={22} />
         </div>
-        <h2 className="text-sm font-semibold text-slate-800">
+        <h2 className="font-display text-sm font-semibold text-foreground">
           Unggah file Excel penjualan harian
         </h2>
-        <p className="mt-1 text-xs text-slate-500">
-          Format .xlsx dengan sheet <span className="font-mono">RAW</span>.
-          Sheet lama dengan tanggal sama akan diperbarui otomatis.
+        <p className="mt-1 text-xs text-muted">
+          Format .xlsx dengan sheet <span className="font-mono">RAW</span>. Data
+          dengan tanggal sama akan diperbarui otomatis.
         </p>
 
         <input
@@ -34,17 +52,13 @@ export function UploadForm() {
           name="file"
           accept=".xlsx"
           required
-          className="mx-auto mt-4 block w-full max-w-sm text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-brand-700"
+          className="mx-auto mt-4 block w-full max-w-sm text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-brand-600"
         />
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
-        >
+        <Button type="submit" disabled={pending} className="mt-4">
           <Upload size={16} />
           {pending ? "Memproses…" : "Proses & Simpan"}
-        </button>
+        </Button>
       </form>
 
       {summary ? <ResultCard summary={summary} /> : null}
@@ -57,14 +71,14 @@ function ResultCard({ summary }: { summary: ImportSummary }) {
   const success = summary.total > 0 && !hasErrors;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5">
+    <Card>
       <div className="mb-4 flex items-center gap-2">
         {success ? (
           <CheckCircle2 className="text-emerald-500" size={18} />
         ) : (
           <AlertTriangle className="text-amber-500" size={18} />
         )}
-        <h3 className="text-sm font-semibold text-slate-800">
+        <h3 className="text-sm font-semibold text-foreground">
           {success ? "Impor berhasil" : "Impor selesai dengan catatan"}
         </h3>
       </div>
@@ -77,26 +91,26 @@ function ResultCard({ summary }: { summary: ImportSummary }) {
       </div>
 
       {hasErrors ? (
-        <div className="mt-4 rounded-lg bg-amber-50 p-3">
-          <p className="mb-1 text-xs font-medium text-amber-700">
+        <div className="mt-4 rounded-lg bg-amber-50 p-3 dark:bg-amber-950/40">
+          <p className="mb-1 text-xs font-medium text-amber-700 dark:text-amber-400">
             Catatan ({summary.errors.length})
           </p>
-          <ul className="list-inside list-disc space-y-0.5 text-xs text-amber-700">
+          <ul className="list-inside list-disc space-y-0.5 text-xs text-amber-700 dark:text-amber-400">
             {summary.errors.map((e, i) => (
               <li key={i}>{e}</li>
             ))}
           </ul>
         </div>
       ) : null}
-    </div>
+    </Card>
   );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-slate-50 p-3">
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold text-slate-800">{value}</p>
+    <div className="rounded-lg bg-surface-muted p-3">
+      <p className="text-xs text-subtle">{label}</p>
+      <p className="mt-0.5 text-sm font-semibold text-foreground">{value}</p>
     </div>
   );
 }

@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/profile";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { UserMenu } from "@/components/layout/user-menu";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { GlobalSearch } from "@/components/layout/global-search";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default async function DashboardLayout({
   children,
@@ -20,17 +24,25 @@ export default async function DashboardLayout({
   const isAdmin = profile?.role === "admin";
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <SidebarNav isAdmin={isAdmin} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 md:px-6">
-          <h1 className="text-sm font-medium text-slate-500">
-            Ringkasan performa penjualan toko
-          </h1>
-          {profile ? <UserMenu profile={profile} /> : null}
-        </header>
-        <main className="flex-1 px-4 py-5 md:px-6">{children}</main>
+    <TooltipProvider delayDuration={200}>
+      <div className="flex min-h-screen bg-background">
+        <SidebarNav isAdmin={isAdmin} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md md:px-6">
+            <div className="flex items-center gap-3 pl-11 md:pl-0">
+              <Breadcrumb />
+            </div>
+            <div className="flex items-center gap-3">
+              <GlobalSearch />
+              <ThemeToggle />
+              {profile ? <UserMenu profile={profile} /> : null}
+            </div>
+          </header>
+          <main className="flex-1 px-4 py-5 md:px-6">
+            <div className="animate-in">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

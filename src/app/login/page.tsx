@@ -1,5 +1,8 @@
 import { MapPin } from "lucide-react";
 import { signIn } from "@/app/actions/auth";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default async function LoginPage({
   searchParams,
@@ -9,21 +12,21 @@ export default async function LoginPage({
   const params = await searchParams;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-foreground text-background">
             <MapPin size={24} />
           </div>
-          <h1 className="mt-3 text-xl font-semibold text-slate-900">
+          <h1 className="mt-3 font-display text-xl font-semibold text-foreground">
             OneMapTech
           </h1>
-          <p className="text-sm text-slate-500">Dashboard Penjualan Toko</p>
+          <p className="text-sm text-muted">Dashboard Penjualan Toko</p>
         </div>
 
         <form
           action={signIn}
-          className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+          className="space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
         >
           <input
             type="hidden"
@@ -32,47 +35,40 @@ export default async function LoginPage({
           />
 
           {params.error ? (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            <p className="rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-600 dark:bg-brand-950 dark:text-brand-300">
               {params.error}
             </p>
           ) : null}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Sales ID
-            </label>
-            <input
+            <Label htmlFor="salesId">Sales ID</Label>
+            <Input
+              id="salesId"
               type="text"
               name="salesId"
               required
               inputMode="numeric"
               pattern="[0-9]*"
               autoComplete="username"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               placeholder="22008205"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
               type="password"
               name="password"
               required
               autoComplete="current-password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               placeholder="••••••••"
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700"
-          >
+          <Button type="submit" size="lg" className="w-full">
             Masuk
-          </button>
+          </Button>
         </form>
       </div>
     </div>

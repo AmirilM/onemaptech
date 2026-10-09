@@ -1,27 +1,59 @@
-import { LogOut } from "lucide-react";
+"use client";
+
 import { signOut } from "@/app/actions/auth";
 import type { Profile } from "@/lib/types";
+import { LogOut, User as UserIcon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function UserMenu({ profile }: { profile: Profile }) {
   const name = profile.sales_id ?? profile.full_name ?? profile.email;
+
   return (
-    <div className="flex items-center gap-3">
-      <div className="hidden text-right sm:block">
-        <p className="text-sm font-medium text-slate-800">{name}</p>
-        <p className="text-xs capitalize text-slate-400">{profile.role}</p>
-      </div>
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
-        {name.charAt(0).toUpperCase()}
-      </div>
-      <form action={signOut}>
-        <button
-          type="submit"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
-        >
-          <LogOut size={14} />
-          Keluar
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center gap-2.5 rounded-lg p-1 pr-2 text-left transition-colors hover:bg-surface-muted">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-xs font-semibold text-white">
+            {name.charAt(0).toUpperCase()}
+          </span>
+          <span className="hidden sm:block">
+            <span className="block text-sm font-medium leading-none text-foreground">
+              {name}
+            </span>
+            <span className="mt-0.5 block text-[11px] capitalize leading-none text-subtle">
+              {profile.role}
+            </span>
+          </span>
         </button>
-      </form>
-    </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>
+          <span className="block text-foreground">{name}</span>
+          <span className="block text-[11px] capitalize">{profile.role}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <a href="/settings">
+            <UserIcon size={15} />
+            Pengaturan
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <form action={signOut}>
+          <DropdownMenuItem asChild>
+            <button type="submit" className="w-full text-brand-500">
+              <LogOut size={15} />
+              Keluar
+            </button>
+          </DropdownMenuItem>
+        </form>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
